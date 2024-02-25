@@ -1,0 +1,31 @@
+<?php
+include('__include_connect.php');
+require("../../modules/dichvuClass.php");
+
+$db = new dichvu();
+$msdn = $_COOKIE['msdn'];
+$mshs = $_COOKIE['mshs'];
+$msdv = $_COOKIE['msdv'];
+$msdichvu = $_POST['msdichvu'];
+if ($msdichvu == '') {
+    $msdichvu = 'GDV' . date("dmyHis", time()) . rand(1000, 9999);
+}
+$mslieutrinh = 'KLT' . date("dmyHis", time()) . rand(1000, 9999);
+$lieutrinh = '2';
+$mshh = $_POST['mshh'];
+$tenhh = $_POST['tenhh'];
+$soluong = $_POST['soluong'];
+$dongia = $_POST['dongia'];
+$ptthuchien = $_POST['ptthuchien'];
+$phanbo = $_POST['phanbo'];
+if ($mshh == "DV0000000000000001") {
+    $dongia = -$dongia;
+}
+$db->add_chitiet_lieutrinh($msdn, $mshs, $msdv, $msdichvu, $mslieutrinh, $mshh, $tenhh, $soluong, $dongia, '', $ptthuchien);
+if ($phanbo === 'true') {
+    $db->update_sotien_chitiet_dichvu($mshs, $msdv, $msdichvu, $mshh, 'Luu');
+}
+
+
+header('Content-Type: application/json');
+echo json_encode($msdichvu);

@@ -1,0 +1,190 @@
+function load_khachhang() {
+  const ngaysn = $("#ngaysn_search").val();
+  const nhom = $("#nhom_filter option:selected").val();
+  $.post(
+    "ajax/khachhang/load_khachhang.php",
+    { ngaysn: ngaysn, nhom: nhom == undefined ? "" : nhom },
+    function (data, textStatus, jqXHR) {
+      $("#list_khachhang").html(data);
+    }
+  );
+}
+
+function load_baocao_dotuoi() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  $.post(
+    "ajax/baocao/baocaodotuoi.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    async function (data, textStatus, jqXHR) {
+      $("#list_baocao_dotuoi").html(data);
+    }
+  );
+}
+
+function load_nhom_kh() {
+  $.post(
+    "ajax/khachhang/load_nhom_kh.php",
+    {},
+    function (data, textStatus, jqXHR) {
+      $("#nhom_filter").append(`
+        <option class='text-[#747474]' value="">Chọn nhóm</option>
+        `);
+      for (let i = 0; i < data.length; i++) {
+        $("#nhom_filter").append(
+          `<option class='text-[black]' value="${data[i].msnhom}">${data[i].tennhom}</option>`
+        );
+      }
+    }
+  );
+}
+
+function open_edit_khachhang(
+  mskh,
+  tenkh,
+  ngaysinh,
+  sodienthoai,
+  email,
+  gioitinh,
+  diachi
+) {
+  open_modal("form_edit_khachhang");
+  $("#mskh_edit").val(mskh);
+  $("#tenkhachhang_edit").val(tenkh);
+  $("#diachi_edit").val(diachi);
+  $("#ngaysinh_edit").val(ngaysinh);
+}
+
+function edit_khachhang() {
+  const mskh = $("#mskh_edit").val();
+  const tenkh = $("#tenkhachhang_edit").val();
+  const diachi = $("#diachi_edit").val();
+  const ngaysinh = $("#ngaysinh_edit").val();
+  $.post(
+    "ajax/khachhang/edit_khachhang.php",
+    {
+      mskh: mskh,
+      tenkh: tenkh,
+      diachi: diachi,
+      ngaysinh: ngaysinh,
+    },
+    function (data, textStatus, jqXHR) {
+      close_modal("form_edit_khachhang");
+      load_khachhang();
+    }
+  );
+}
+
+function khachhang_search(e) {
+  var input, filter, table, tr, td, i, j, cell;
+  input = document.getElementById("search");
+  filter = input.value
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"));
+  table = document.getElementById("list_khachhang");
+  tr = table.getElementsByClassName("items");
+  for (i = 0; i < tr.length; i++) {
+    // Hide the row initially.
+    tr[i].style.display = "none";
+    td = tr[i].getElementsByClassName("search_key");
+    for (var j = 0; j < td.length; j++) {
+      cell = tr[i].getElementsByClassName("search_key")[j];
+      if (cell) {
+        if (
+          cell.innerHTML
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"))
+            .indexOf(filter) > -1
+        ) {
+          tr[i].style.display = "";
+          break;
+        }
+      }
+    }
+  }
+}
+
+function open_add_voucher() {
+  open_modal("form_add_voucher");
+}
+
+function add_voucher() {
+  const search = $("#search").val();
+  const ngaysn = $("#ngaysn_search").val();
+  const nhom = $("#nhom_filter option:selected").val();
+  const tenvoucher = $("#tenvoucher_add").val();
+  const sotien = $("#sotien_add").val().replace(/[.]/g, "");
+  const handung = $("#handung_input").val();
+  $.post(
+    "ajax/khachhang/add_voucher.php",
+    {
+      tenvoucher: tenvoucher,
+      sotien: sotien,
+      handung: handung,
+      search: search,
+      ngaysn: ngaysn,
+      nhom: nhom == undefined ? "" : nhom,
+    },
+    function (data, textStatus, jqXHR) {
+      $("#tenvoucher_add").val("");
+      $("#sotien_add").val("");
+      close_modal("form_add_voucher");
+    }
+  );
+}
+
+function baocao_search(e) {
+  var input, filter, table, tr, td, i, j, cell;
+  input = document.getElementById("search_baocao");
+  filter = input.value
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"));
+  table = document.getElementById("body_baocao_phankhuc");
+  tr = table.getElementsByClassName("items");
+  for (i = 0; i < tr.length; i++) {
+    // Hide the row initially.
+    tr[i].style.display = "none";
+    td = tr[i].getElementsByClassName("search_key");
+    for (var j = 0; j < td.length; j++) {
+      cell = tr[i].getElementsByClassName("search_key")[j];
+      if (cell) {
+        if (
+          cell.innerHTML
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"))
+            .indexOf(filter) > -1
+        ) {
+          tr[i].style.display = "";
+          break;
+        }
+      }
+    }
+  }
+}
+
+function open_show_lichsu_khachhang(tenkh, sodienthoai) {
+  $("#tenkhachhang_lichsu").html(tenkh);
+  $.post(
+    "ajax/banhang/load_lichsu_khachhang.php",
+    {
+      sodienthoai: sodienthoai,
+    },
+    function (data, textStatus, jqXHR) {
+      $("#list_lichsu_khachhang").html(data);
+      open_modal("form_history");
+    }
+  );
+}

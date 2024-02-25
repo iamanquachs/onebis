@@ -1,0 +1,316 @@
+<?php
+class nhatky extends database_sv
+{
+    public function load_nhatky($mshs, $msdv, $at_dieutour, $msdn, $loaihinh)
+    {
+        if ($loaihinh == 'NK') {
+            $getall = $this->connect->prepare("SELECT ifnull(b.rowid,'')rowid,a.sodienthoai,ifnull(d.ten_nguoithan,a.tenkh)tenkh,a.soct, ifnull(replace(GROUP_CONCAT(b.rowid, '-',b.ms_rang,'-',b.mslieutrinh, '-', b.tenhh,'-', b.msmota,'-', b.thuchien),',','•'),'')dichvu, ifnull(b.ptgiam,'')ptgiam , ifnull(b.msctkm,'')msctkm, ifnull(c.nhom_kh,'')nhom_kh , 
+               a.trangthai, ifnull(b.ptthuchien,0)ptthuchien, 
+               if(
+						  a.ms_nguoithan ='', 
+						  year(CURDATE()) - YEAR(c.ngaysinh),
+						  year(CURDATE()) - YEAR(d.ngaysinh)
+                            )dotuoi, b.msmota
+                    from banhang_header a 
+                LEFT JOIN banhang_line b ON a.soct=b.soct AND a.msdv=b.msdv  and b.nhom_hh ='DV' AND b.ngay = CURDATE() AND b.mslieutrinh <> 'KLT'
+                INNER JOIN hosokhachhang c ON a.sodienthoai=c.sodienthoai AND a.mshs=c.mshs
+                LEFT JOIN hosonguoithan d ON a.ms_nguoithan = d.ms_nguoithan and c.sodienthoai=d.sodienthoai AND a.mshs=d.mshs
+                WHERE a.msdv='$msdv' and a.ngaykb=CURDATE() and a.mshs='$mshs' and  a.trangthai > '0'  GROUP BY a.soct
+                ORDER BY b.ms_rang, a.trangthai,a.rowid ");
+        } else {
+            $query = '';
+            if ($at_dieutour == '1') {
+                $query = "and a.ms_nguoithuchien = '$msdn'";
+            }
+            $getall = $this->connect->prepare("SELECT a.rowid, a.soct,CONCAT( a.tenhh , ' ', IFNULL(c.tenhhgop, '')) tenhh,a.mshh, a.ptthuchien, b.tenkh,a.thuchien,a.sodienthoai, a.ptgiam, a.msctkm,a.nhom_kh,
+                    a.mslieutrinh, a.tour_yeucau, a.ms_nguoithuchien, a.idchidinh, a.msdv_lieutrinh ,b.ms_nguoithan,a.thuchien
+                    FROM banhang_line a 
+                    inner join banhang_header b ON a.soct=b.soct
+                    LEFT JOIN 
+                    (
+                        SELECT soct, msdichvu, CONCAT(' (', replace(GROUP_CONCAT(b.tenhh),',',', '), ')') tenhhgop
+                        FROM motadichvu a 
+                        INNER JOIN banhang_line b ON a.mshh = b.mshh 
+                        WHERE CURDATE() = DATE(b.ngayhen) AND a.mshs='$mshs' AND a.msdv='$msdv'
+                        GROUP BY msdichvu, soct
+                    ) c
+                    ON	a.soct = c.soct AND a.mshh = c.msdichvu   
+                    WHERE a.thuchien > 0 and CURDATE() = DATE(a.ngayhen) and a.mshs='$mshs'
+                    AND a.msdv='$msdv' $query AND a.nhom_hh='DV'   order by b.mskh, a.thuchien");
+        }
+
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+
+
+    public function load_nguoithuchien($mshs, $msdv, $rowidtc)
+    {
+        $getall = $this->connect->prepare("SELECT replace(GROUP_CONCAT(tennv),',',' | ') AS nhanvien FROM nhatky_thuchien WHERE mshs='$mshs' AND msdv='$msdv' and loai='TH' AND rowidtc='$rowidtc'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+
+    public function ktra_nguoithuchien($msnv, $rowidtc)
+    {
+        $getall = $this->connect->prepare("SELECT msnv FROM nhatky_thuchien WHERE msnv='$msnv' AND rowidtc='$rowidtc'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+    public function add_nguoithuchien($rowidtc, $mshs, $msdv, $soct, $msnv, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("CALL `Post_NhatKyThucHien`('$mshs', '$msdv', '$soct', '$rowidtc', '$msnv', '$mslieutrinh')");
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_nguoithuchien($mshs, $msdv, $msnv, $soct, $rowid, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("CALL `CheckDelete_NhatKyThucHien`('$mshs', '$msdv', '$soct', '$rowid', '$msnv', '$mslieutrinh')
+       ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_noidung($mshs, $msdv, $rowid, $sodienthoai, $loai, $mshh)
+    {
+        $query = '';
+        if ($loai == 'TV' || $loai == 'DT') {
+            $query = "loai='$loai' and mshh='$mshh'";
+        } else {
+            $query = "loai in ($loai)";
+        }
+        $getall = $this->connect->prepare("SELECT rowid, soct, msnv, tennv,mshh, noidung, loai from nhatky_tuvan where mshs='$mshs' and msdv='$msdv'  and sodienthoai='$sodienthoai' and $query order by rowid desc");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function add_noidung($mshs, $msdv, $rowid, $sodienthoai, $soct, $msnv, $tennv, $mshh, $noidung, $loai)
+    {
+        $getall = $this->connect->prepare("INSERT INTO nhatky_tuvan(rowidtc,lastmodify, mshs, msdv, soct,sodienthoai, msnv, tennv,mshh, noidung, loai ) VALUES('$rowid', NOW(),'$mshs', '$msdv', '$soct','$sodienthoai','$msnv', '$tennv','$mshh', '$noidung','$loai')");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_noidung($mshs, $msdv, $rowid)
+    {
+        $getall = $this->connect->prepare("DELETE FROM nhatky_tuvan where mshs='$mshs' and msdv='$msdv' and rowid='$rowid'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function edit_noidung($mshs, $msdv, $rowid, $noidung)
+    {
+        $getall = $this->connect->prepare("UPDATE nhatky_tuvan set noidung='$noidung' where mshs='$mshs' and msdv='$msdv' and rowid='$rowid'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function quatrinhdieutri($mshs, $msdv, $sodienthoai)
+    {
+        $getall = $this->connect->prepare("SELECT rowid, mshh, date_format(lastmodify,'%d/%m/%Y %H:%i') as ngay, tenhh, sodienthoai, soluong
+        FROM banhang_line 
+        WHERE sodienthoai = '$sodienthoai' and mshs='$mshs' and msdv='$msdv' AND nhom_hh NOT IN ('DVLT','LT') ORDER BY lastmodify DESC");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function noidung_quatrinhdieutri($mshs, $msdv, $sodienthoai, $mshh)
+    {
+        $getall = $this->connect->prepare("SELECT noidung, if(loai='TV','Tư vấn','Điều trị')loai
+        FROM nhatky_tuvan
+        WHERE sodienthoai = '$sodienthoai' AND mshh='$mshh' and mshs='$mshs' and msdv='$msdv' 
+        ORDER BY lastmodify DESC, loai");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    //load danh sách từ hosohanghoa
+    public function tim_hanghoa($mshs, $msdv, $tenhh)
+    {
+        $getall = $this->connect->prepare("SELECT a.mshh, a.tenhh,a.dvt ,
+         a.pttichluy, a.ptthuchien,a.songay_bh,a.loai_hh,
+         a.gianhap, a.giaban , a.thuesuat
+         FROM hosohanghoa a 
+         WHERE a.mshs='$mshs' and a.msdv='$msdv' AND (a.tenhh LIKE '%$tenhh%' or a.mshh like '%$tenhh%') 
+         and a.trangthai='0' order by a.tenhh");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function tim_dichvu($mshs, $msdv, $tenhh)
+    {
+        $getall = $this->connect->prepare("SELECT msdichvu, tendichvu, lieutrinh
+         FROM hosodichvu
+         WHERE mshs='$mshs' and msdv='$msdv' AND (tendichvu LIKE '%$tenhh%' or msdichvu like '%$tenhh%') 
+         and trangthai='0' order by tendichvu");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_banhang_line($msdv, $soct)
+    {
+        $getall = $this->connect->prepare("SELECT mshh,tenhh, soct, idchidinh, loai_hh,soluong, sum(soluong * giathu) as thanhtien, dathu, ptgiam  from banhang_line where soct='$soct' and msdv='$msdv'  and nhom_hh<>'VC' and nhom_hh<>'DT'  GROUP BY idchidinh  order by rowid desc ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_chidinh_dichvu_rang($mshs, $msdv, $soct)
+    {
+
+        // $getall = $this->connect->prepare("SELECT rowid,mshh, tenhh, soct, idchidinh,sum(soluong * giaban)giaban, 
+        // sum(soluong * giathu) as thanhtien,max(ptgiam)ptgiam,  ms_rang, mslieutrinh  from banhang_line 
+        // where soct='$soct' and mshs='$mshs' and msdv='$msdv'
+        // and nhom_hh NOT IN ('DVLV', 'LT', 'DT') AND idchidinh<>'AUTOPOST'
+        //  GROUP BY idchidinh,ms_rang order by ms_rang desc");
+        $getall = $this->connect->prepare("SELECT rowid,mshh, tenhh, tenlieutrinh, soct, idchidinh,sum(round(giaban,0))giaban,         
+        sum(round(soluong * giathu,0)) as thanhtien,max(ptgiam)ptgiam,  ms_rang, mslieutrinh  from banhang_line         
+        where soct='$soct' and mshs='$mshs' and msdv='$msdv'        
+        and nhom_hh NOT IN ('DVLV', 'LT', 'DT') AND idchidinh<>'AUTOPOST'         AND mslieutrinh = ''
+        GROUP BY idchidinh,ms_rang
+        UNION ALL 
+        
+        SELECT a.rowid,a.mshh, a.tenhh, a.tenlieutrinh, a.soct, a.idchidinh, b.giaban, b.thanhtien, a.ptgiam,  a.ms_rang, a.mslieutrinh  
+        FROM
+        (
+            SELECT rowid,mshh, tenhh, tenlieutrinh, soct, idchidinh,sum(round(giaban,0))giaban,         
+            sum(round(soluong * giathu,0)) as thanhtien,max(ptgiam)ptgiam,  ms_rang, mslieutrinh  from banhang_line         
+            where soct='$soct' and mshs='$mshs' and msdv='$msdv'        
+            and nhom_hh NOT IN ('DVLV', 'LT', 'DT') AND idchidinh<>'AUTOPOST' AND  mslieutrinh IN ('CHA','KLT')
+            GROUP BY idchidinh,ms_rang 
+        ) a INNER JOIN 
+        (
+            SELECT soct, msdv_lieutrinh, sum(round(soluong * giathu,0)) thanhtien, sum(round( giaban,0))giaban FROM  banhang_line         
+            WHERE  msdv='$msdv'  AND soct='$soct'  AND mshs = '$mshs'
+            GROUP BY soct, msdv_lieutrinh
+        ) b ON a.soct = b.soct AND a.mshh = b.msdv_lieutrinh
+             ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+
+    public function load_khachhang_dichvu_rang($mshs, $msdv, $soct)
+    {
+        $getall = $this->connect->prepare("SELECT CONCAT(ifnull(d.ten_nguoithan,a.tenkh),' • ',ifnull(ifnull(TIMESTAMPDIFF(year,d.ngaysinh,CURDATE()),TIMESTAMPDIFF(year,c.ngaysinh,CURDATE())),''),' tuổi (',ifnull(YEAR(d.ngaysinh),YEAR(c.ngaysinh)),')',' • ',c.diachi) AS khachhang
+        ,a.sodienthoai, c.nhom_kh, ifnull(b.phantramgiam,0)ptgiam,a.trangthai, a.ms_nguoithan
+                FROM banhang_header a 
+                 INNER JOIN hosokhachhang c ON a.sodienthoai=c.sodienthoai AND a.mshs=c.mshs
+                left JOIN nhom_khachhang b ON b.msnhom=c.nhom_kh  AND a.mshs=b.mshs
+                left join hosonguoithan d on a.ms_nguoithan=d.ms_nguoithan and a.sodienthoai=d.sodienthoai and a.mshs=d.mshs
+                WHERE a.soct='$soct' and a.mshs='$mshs' and a.msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_dichvu_khongcorang($mshs, $msdv, $soct)
+    {
+        $getall = $this->connect->prepare("SELECT replace(GROUP_CONCAT(tenhh),',',' • ')tenhh, soct, idchidinh,  
+        sum(round(giathu* soluong,0)) as thanhtien,  ms_rang, idtuvan  from banhang_line 
+        where soct='$soct' and mshs='$mshs' and msdv='$msdv'
+        and nhom_hh NOT IN ('DVLV', 'LT', 'DT') AND ms_rang ='' AND idchidinh<>'AUTOPOST' 
+         GROUP BY ms_rang order by ms_rang");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_rang_banhangline($mshs, $msdv, $soct)
+    {
+        $getall = $this->connect->prepare("SELECT replace(GROUP_CONCAT(rowid),',','-')rowid,replace(GROUP_CONCAT(tenhh),',',' | ')tenhh, soct, idchidinh,  
+        sum(round(soluong * giathu,0)) as thanhtien,  ms_rang, idtuvan  from banhang_line 
+        where soct='$soct' and mshs='$mshs' and msdv='$msdv'
+        and nhom_hh NOT IN ('DVLV', 'LT', 'DT') AND ms_rang <>'' 
+         GROUP BY ms_rang order by ms_rang");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_lichsu_dieutri_rang($mshs, $msdv, $sodienthoai)
+    {
+        $getall = $this->connect->prepare("SELECT DATE_FORMAT(lastmodify,'%d/%m/%Y %H:%i')ngay,  ms_rang, replace(GROUP_CONCAT(tenhh),',',' | ')tenhh, soct, idchidinh,  
+        sum(soluong * giathu) as thanhtien,  ms_rang, idtuvan  from banhang_line 
+        where mshs='$mshs' and msdv='$msdv'
+        and nhom_hh NOT IN ('DVLV', 'LT') AND ngay<curdate()
+        and sodienthoai='$sodienthoai'
+        GROUP BY ms_rang, sodienthoai, ngay order by ngay desc, ms_rang");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function ktra_rang_banhangline($mshs, $msdv, $soct, $ms_rang)
+    {
+        $getall = $this->connect->prepare("SELECT COUNT(idchidinh)solan FROM banhang_line 
+        WHERE soct='$soct' AND mshs='$mshs' AND msdv='$msdv' AND tam=1 AND ms_rang='$ms_rang'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_dichvu_rang($mshs, $msdv, $soct, $idchidinh)
+    {
+        $getall = $this->connect->prepare("DELETE FROM banhang_line 
+        WHERE soct='$soct' AND mshs='$mshs' AND msdv='$msdv' and nhom_hh='RA' AND tam=1 AND idchidinh='$idchidinh'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_rang($mshs, $msdv, $soct, $msrang)
+    {
+        $getall = $this->connect->prepare("DELETE FROM banhang_line 
+        WHERE soct='$soct' AND mshs='$mshs' AND msdv='$msdv' AND ms_rang='$msrang'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function update_dichvu_rang($mshs, $msdv, $soct, $idchidinh, $ms_rang, $colieutrinh, $ngayhen, $giohen, $chandoan)
+    {
+        $ngaydathen = '';
+        $ngay = $ngayhen . ' ' . $giohen;
+        if ($colieutrinh == 0) {
+            $ngaydathen = ", ngayhen='$ngay'";
+        }
+        $getall = $this->connect->prepare("UPDATE banhang_line set ms_rang='$ms_rang', idtuvan=if('$chandoan' = '', idtuvan, '$chandoan') $ngaydathen 
+        WHERE soct='$soct' AND mshs='$mshs' AND msdv='$msdv' AND tam=1 AND idchidinh='$idchidinh';
+        -- UPDATE banhang_line set thuchien=1
+        -- WHERE soct='$soct' AND mshs='$mshs' AND msdv='$msdv' AND ngay=CURDATE() AND idchidinh='$idchidinh'
+         ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+    public function update_chandoan_rang($mshs, $msdv, $soct, $ms_rang, $idtuvan)
+    {
+        $getall = $this->connect->prepare("UPDATE banhang_line set idtuvan='$idtuvan'
+        WHERE soct='$soct' AND mshs='$mshs' AND msdv='$msdv'  AND ms_rang='$ms_rang'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function add_img_nhatky($mshs, $msdv, $rowid, $path_img)
+    {
+        $getall = $this->connect->prepare("UPDATE banhang_line set img_dieutri=concat(img_dieutri,'$path_img')  where mshs='$mshs' and msdv='$msdv' and rowid='$rowid'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_image($rowid)
+    {
+        $getall = $this->connect->prepare("SELECT mshs,lastmodify, img_dieutri FROM banhang_line where rowid='$rowid' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function edit_image($rowid, $img_dieutri)
+    {
+        $getall = $this->connect->prepare("UPDATE banhang_line set lastmodify=NOW(), img_dieutri = '$img_dieutri' where rowid='$rowid'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+}

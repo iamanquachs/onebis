@@ -1,0 +1,1072 @@
+//! báo cáo thu chi
+function load_baocao_thuchi() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  const khoanmuc = $("#list_khoanmuc_filter option:selected").val();
+  const nguoilap = $("#list_nguoilap_filter option:selected").val();
+
+  $.post(
+    "ajax/baocao/baocao_thuchi.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+      khoanmuc: khoanmuc == undefined ? "" : khoanmuc,
+      nguoilap: nguoilap == undefined ? "" : nguoilap,
+    },
+    async function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao").html(data);
+    }
+  );
+}
+
+function load_baocao_thuchiendichvu() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  $.post(
+    "ajax/baocao/baocao_thuchiendichvu.php",
+    {
+      msdv: msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    async function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao").html(data);
+    }
+  );
+}
+
+function open_update_khoantru(rowid, nhanvien, sotien) {
+  $("#tennv_update").text(nhanvien);
+  $("#rowid_update").val(rowid);
+  $("#sotien_khoantru").val(sotien);
+  open_modal("form_update_khoantru");
+}
+
+function update_khoantru() {
+  const rowid = $("#rowid_update").val();
+  const sotien = $("#sotien_khoantru").val().replaceAll(".", "");
+  $.post(
+    "ajax/baocao/update_khoantru.php",
+    {
+      rowid: rowid,
+      sotien: sotien,
+    },
+    function (data, textStatus, jqXHR) {
+      load_baocao_thuchiendichvu();
+      close_modal("form_update_khoantru");
+    }
+  );
+}
+
+function open_add_thuchi_luong(msnv, tennv, tongnhan, tamung) {
+  $("#msnv_add").val(msnv);
+  $("#tennv_add").val(tennv);
+  if (tamung > 0) {
+    $("#sotien_tamung_add").val(
+      tamung.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+    );
+    $("#sotien_luong_add").val(
+      tongnhan.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+    );
+    $("#input_tamung").removeClass("hidden");
+    $("#loaichungtu_add").val(0);
+    $("#loai_thuchi").html("Thu tiền tạm ứng và chi lương " + tennv);
+  } else {
+    $("#loaichungtu_add").val(1);
+    $("#loai_thuchi").html("Chi tiền lương " + tennv);
+    $("#input_tamung").addClass("hidden");
+    $("#sotien_luong_add").val(
+      tongnhan.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+    );
+  }
+  open_modal("form_add_thuchi");
+}
+
+function add_thuchi_luong() {
+  const tien_tamung = $("#sotien_tamung_add").val().replaceAll(".", "");
+  const tienluong = $("#sotien_luong_add").val().replaceAll(".", "");
+  const nganquy = $("#nganquy_thuchi option:selected").val();
+  const loaichungtu = $("#loaichungtu_add").val();
+  const msnv = $("#msnv_add").val();
+  const tennv = $("#tennv_add").val();
+  const makhoanmuc_chi = $("#ID_chiluong").val();
+  const makhoanmuc_thu = $("#ID_thutamung").val();
+  $.post(
+    "ajax/baocao/add_thuchi_luong.php",
+    {
+      tien_tamung: tien_tamung,
+      tienluong: tienluong,
+      nganquy: nganquy,
+      loaichungtu: loaichungtu,
+      msnv: msnv,
+      tennv: tennv,
+      makhoanmuc_chi: makhoanmuc_chi,
+      makhoanmuc_thu: makhoanmuc_thu,
+    },
+    function (data, textStatus, jqXHR) {
+      load_baocao_thuchiendichvu();
+      close_modal("form_add_thuchi");
+    }
+  );
+}
+
+function open_phieu_dathuchien(sophieuchi, sophieuthu, msnv, tennv) {
+  $("#sophieuchi").val(sophieuchi);
+  $("#sophieuthu").val(sophieuthu);
+  $("#tennv_delete").val(tennv);
+  $("#msnv_delete").val(msnv);
+  open_modal("form_phieu_dathuchien");
+}
+
+function delete_thuchi_luong() {
+  const sophieuchi = $("#sophieuchi").val();
+  const sophieuthu = $("#sophieuthu").val();
+  const msnv = $("#msnv_delete").val();
+  $.post(
+    "ajax/baocao/delete_thuchi_luong.php",
+    { sophieuchi: sophieuchi, sophieuthu: sophieuthu, msnv: msnv },
+    function (data, textStatus, jqXHR) {
+      load_baocao_thuchiendichvu();
+      close_modal("form_phieu_dathuchien");
+    }
+  );
+}
+
+function load_chitiet_baocao_thuchiendichvu(msnv, tennv) {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  $("#chitiet_tennhanvien_thuchien").html(tennv);
+  $.post(
+    "ajax/baocao/chitiet_baocao_thuchiendichvu.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+      msnv: msnv,
+    },
+    async function (data, textStatus, jqXHR) {
+      open_modal("form_chitiet_baocao_thuchien");
+      $("#chitiet_baocao_in_form").html(data);
+    }
+  );
+}
+function load_baocao_hanghoa_dichvu() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  const loai = $("#loai_filter option:selected").val();
+  const loai_baocao = $("#loai_baocao option:selected").val();
+  $.post(
+    "ajax/baocao/baocao_hanghoa_dichvu.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+      loai: loai,
+      loai_baocao: loai_baocao,
+    },
+    async function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao").html(data);
+      if (loai_baocao == "HHDV") {
+        $("#tenloai_baocao").text("Khách hàng");
+      } else {
+        $("#tenloai_baocao").text("Dịch vụ");
+      }
+      load_baocao_hanghoa_dichvu_chuadoanhthu();
+    }
+  );
+}
+
+function load_baocao_hanghoa_dichvu_chuadoanhthu() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  $.post(
+    "ajax/baocao/baocao_hanghoa_dichvu_chuadoanhthu.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    async function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao_chuacodoanhthu").html(data);
+    }
+  );
+}
+
+function baocao_hieuqua_nhanvien() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  const khachhang = $("#list_khachhang_filter option:selected").val();
+  const nhanvien = $("#list_nguoilap_filter option:selected").val();
+  const danhgia = $("#list_danhgia_filter option:selected").val();
+  $.post(
+    "ajax/baocao/baocao_hieuqua_nhanvien.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+      khachhang: khachhang == undefined ? "" : khachhang,
+      nhanvien: nhanvien == undefined ? "" : nhanvien,
+      danhgia: danhgia == undefined ? "" : danhgia,
+      loai: "list",
+    },
+    async function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao").html("");
+      chart_baocao_danhgia();
+      var RKHL = 0;
+      var KHL = 0;
+      var HL = 0;
+      var RHL = 0;
+      let tongloinhuan = 0;
+      for (let i = 0; i < data.length; i++) {
+        tongloinhuan += Number(data[i].loinhuan);
+        var loai_danhgia = "";
+        switch (data[i].mshh) {
+          case "1RKHL":
+            RKHL += 1;
+            loai_danhgia =
+              "<img class='max-w-[32px]' src='vendor/img/ratkhonghailong.png'>";
+            break;
+          case "2KHL":
+            KHL += 1;
+            loai_danhgia =
+              "<img class='max-w-[32px]' src='vendor/img/khonghailong.png'>";
+            break;
+          case "3HL":
+            HL += 1;
+            loai_danhgia =
+              "<img class='max-w-[32px]' src='vendor/img/hailong.png'>";
+            break;
+          default:
+            RHL += 1;
+            loai_danhgia =
+              "<img class='max-w-[32px]' src='vendor/img/rathailong.png'>";
+            break;
+        }
+        $("#chitiet_baocao").append(`
+        <tr class="active_items item_line border-b border-dashed border-[#ffffff40] items" onclick='active_item(this)'>
+        <td class="px-4 py-2 text-center ">${i + 1}</td>
+        <td class=" px-4 py-2 text-center font-thin">${data[i].ngaythuhien}</td>
+        <td class=" px-4 py-2 text-center font-thin">${
+          data[i].ngayhoanthanh
+        }</td>
+        <td class=" px-4 py-2 text-center font-thin">${data[i].thoigian}</td>
+        <td class=" px-4 py-2 text-left font-thin">${data[i].tenhh}</td>
+        <td class=" px-4 py-2 text-right font-thin">${data[i].loinhuan
+          .toString()
+          .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</td>
+        <td class="search_key px-4 py-2 font-thin text-left">${
+          data[i].khachhang
+        }</td>
+        <td class="search_key px-4 py-2 font-thin text-center">${
+          data[i].tennv
+        }</td>
+     
+        <td class=" px-4 py-2  flex justify-center">${loai_danhgia}</td>
+    </tr>
+        `);
+      }
+      $("#chitiet_baocao").append(`
+        <tr class="active_items item_line border-b border-dashed border-[#ffffff40] items" onclick='active_item(this)'>
+        <td colspan='5' class="px-4 py-2 text-right text-[#ffff00] text-lg">Tổng cộng</td>
+        <td class=" px-4 py-2 text-right font-thin text-[#ffff00] text-lg">${tongloinhuan
+          .toString()
+          .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</td>
+    </tr>
+        `);
+    }
+  );
+}
+
+function chart_baocao_danhgia() {
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  const msdv = $("#list_chinhanh option:selected").val();
+  const khachhang = $("#list_khachhang_filter option:selected").val();
+  const nhanvien = $("#list_nguoilap_filter option:selected").val();
+  const danhgia = $("#list_danhgia_filter option:selected").val();
+  $.post(
+    "ajax/baocao/baocao_hieuqua_nhanvien.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+      khachhang: khachhang == undefined ? "" : khachhang,
+      nhanvien: nhanvien == undefined ? "" : nhanvien,
+      danhgia: danhgia == undefined ? "" : danhgia,
+      loai: "chart",
+    },
+    function (list, textStatus, jqXHR) {
+      var dataNhanvien = new google.visualization.DataTable();
+      dataNhanvien.addColumn("string", "Department");
+      dataNhanvien.addColumn("number", "");
+      for (let i = 0; i < list.length; i++) {
+        dataNhanvien.addRows([[list[i].mshh, Number(list[i].soluong)]]);
+      }
+
+      var view = new google.visualization.DataView(dataNhanvien);
+      view.setColumns([
+        0,
+        1,
+        {
+          calc: "stringify",
+          sourceColumn: 1,
+          type: "string",
+          role: "annotation",
+        },
+      ]);
+
+      var options = {
+        title: "Mức độ hài lòng",
+        position: "center",
+        titlePosition: "absolute",
+        curveType: "function",
+        legend: {
+          position: "none",
+        },
+      };
+      var chart = new google.visualization.BarChart(
+        document.getElementById("chart_div")
+      );
+      chart.draw(view, options);
+    }
+  );
+}
+
+function load_baocao_congno_tonghop(loai) {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  $.post(
+    "ajax/baocao/baocaocongno_tonghop.php",
+    {
+      loai: loai,
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao").html(data);
+    }
+  );
+}
+
+function load_baocao_hoatdong() {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  $("#chitiet_baocao").html("");
+
+  $.post(
+    "ajax/baocao/baocaohoatdong.php",
+    {
+      loai: 2,
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    function (data, textStatus, jqXHR) {
+      let tongdoanhthu = 0;
+      let tongchiphi = 0;
+      let tongmsdv = "";
+      if (data != "") {
+        for (let i = 0; i < data.length; i++) {
+          let dt = Number(data[i].doanhthu);
+          tongdoanhthu += dt;
+          tongchiphi = tongchiphi + Number(data[i].chiphi);
+          tongmsdv = data[i].msdv;
+          $("#chitiet_baocao").append(`
+          <tr class="active_items item_line border-b border-dashed border-[#ffffff40] items" onclick='active_item(this)'>
+              <td class="px-4 py-2 text-center ">${i + 1}</td>
+              <td class=" px-4 py-2 text-center font-thin">${data[i].ngay}</td>
+              <td class="search_key px-4 py-2 font-thin text-center">${
+                data[i].sophieu
+              }</td>
+              <td class="search_key px-4 py-2 font-thin text-center">${
+                data[i].nguoilap
+              }</td>
+              <td class=" px-4 py-2 text-right text-lg ">${data[i].doanhthu
+                .toString()
+                .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</td>
+              <td class=" px-4 py-2  text-right text-lg ">${data[i].chiphi
+                .toString()
+                .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</td>
+              <td class=" px-4 py-2  text-center">${data[i].msdv}</td>
+          </tr>
+          `);
+        }
+        $("#chitiet_baocao").append(`
+            <tr class="active_items item_line border-b border-dashed border-[#ffffff40] text-[#edf74b] text-lg text-right" onclick='active_item(this)'>
+                <td colspan='4' class="px-4 py-2 ">Tổng cộng</td>
+                <td class=" px-4 py-2">${tongdoanhthu
+                  .toString()
+                  .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</td>
+                <td class=" px-4 py-2">${tongchiphi
+                  .toString()
+                  .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")}</td>
+                <td class=" px-4 py-2 font-thin text-center">${tongmsdv}</td>
+            </tr>
+            `);
+      }
+    }
+  );
+}
+
+function chart_baocao_hoatdong() {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  $.post(
+    "ajax/baocao/baocaohoatdong.php",
+    {
+      loai: 1,
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+      list: "list",
+    },
+    function (data, textStatus, jqXHR) {
+      var dataHoatdong = new google.visualization.DataTable();
+      dataHoatdong.addColumn("string", "Ngày");
+      dataHoatdong.addColumn("number", "Doanh thu");
+      dataHoatdong.addColumn("number", "Chi phí");
+      dataHoatdong.addColumn("number", "Lợi nhuận");
+      for (let i = 0; i < data.length; i++) {
+        dataHoatdong.addRows([
+          [
+            data[i].ngay,
+            Number(data[i].doanhthu),
+            Number(data[i].chiphi),
+            Number(data[i].loinhuan),
+          ],
+        ]);
+      }
+      var view = new google.visualization.DataView(dataHoatdong);
+      view.setColumns([
+        0,
+        1,
+        {
+          calc: "stringify",
+          sourceColumn: 1,
+          type: "string",
+          role: "annotation",
+        },
+        2,
+        {
+          calc: "stringify",
+          sourceColumn: 2,
+          type: "string",
+          role: "annotation",
+        },
+        3,
+        {
+          calc: "stringify",
+          sourceColumn: 3,
+          type: "string",
+          role: "annotation",
+        },
+      ]);
+
+      var options = {
+        title: "Hoạt động kinh doanh theo ngày",
+        curveType: "function",
+        vAxis: { title: "Triệu đồng" },
+        legend: {
+          position: "bottom",
+        },
+      };
+
+      var chart = new google.visualization.LineChart(
+        document.getElementById("curve_chart")
+      );
+
+      chart.draw(view, options);
+    }
+  );
+}
+function chart_baocao_hoatdong_cautruc_chiphi() {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const nam = $("#list_namhoatdong option:selected").val();
+  const d = new Date();
+  let year = d.getFullYear();
+  $.post(
+    "ajax/baocao/baocaohoatdong_theonam.php",
+    {
+      nam: nam == null ? year : nam,
+      msdv: msdv == undefined ? "" : msdv,
+      loai: "cautruc",
+    },
+    function (data, textStatus, jqXHR) {
+      var dataChiphi = new google.visualization.DataTable();
+      dataChiphi.addColumn("string", "Tháng");
+      dataChiphi.addColumn("number", "Tổng");
+      dataChiphi.addColumn("number", "Lương");
+      dataChiphi.addColumn("number", "Điện");
+      dataChiphi.addColumn("number", "Nhà");
+      dataChiphi.addColumn("number", "Mua hàng");
+      dataChiphi.addColumn("number", "Khác");
+
+      for (let i = 0; i < data.length; i++) {
+        dataChiphi.addRows([
+          [
+            data[i].thang,
+            {
+              v: Number(data[i].tongchiphi),
+              f: data[i].tongchiphi + " (" + data[i].pttong + "%)",
+            },
+            {
+              v: Number(data[i].luong),
+              f: data[i].luong + " (" + data[i].ptluong + "%)",
+            },
+            {
+              v: Number(data[i].dien),
+              f: data[i].dien + " (" + data[i].ptdien + "%)",
+            },
+            {
+              v: Number(data[i].nha),
+              f: data[i].nha + " (" + data[i].ptnha + "%)",
+            },
+            {
+              v: Number(data[i].muahang),
+              f: data[i].muahang + " (" + data[i].ptmuahang + "%)",
+            },
+            {
+              v: Number(data[i].khac),
+              f: data[i].khac + " (" + data[i].ptkhac + "%)",
+            },
+          ],
+        ]);
+      }
+      var view = new google.visualization.DataView(dataChiphi);
+      view.setColumns([
+        0,
+        1,
+        {
+          calc: "stringify",
+          sourceColumn: 1,
+          type: "string",
+          role: "annotation",
+        },
+        2,
+        {
+          calc: "stringify",
+          sourceColumn: 2,
+          type: "string",
+          role: "annotation",
+        },
+        3,
+        {
+          calc: "stringify",
+          sourceColumn: 3,
+          type: "string",
+          role: "annotation",
+        },
+        4,
+        {
+          calc: "stringify",
+          sourceColumn: 4,
+          type: "string",
+          role: "annotation",
+        },
+        5,
+        {
+          calc: "stringify",
+          sourceColumn: 5,
+          type: "string",
+          role: "annotation",
+        },
+        6,
+        {
+          calc: "stringify",
+          sourceColumn: 6,
+          type: "string",
+          role: "annotation",
+        },
+      ]);
+
+      var options = {
+        title: "Cấu trúc chi phí",
+        seriesType: "bars",
+        animation: {
+          duration: 1000,
+          easing: "in",
+        },
+        vAxis: { title: "Triệu đồng" },
+        legend: {
+          position: "bottom",
+        },
+      };
+
+      var chart = new google.visualization.ComboChart(
+        document.getElementById("chart_cautruc")
+      );
+
+      chart.draw(view, options);
+    }
+  );
+}
+
+function chart_baocao_hoatdong_theonam() {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const nam = $("#list_namhoatdong option:selected").val();
+  const d = new Date();
+  let year = d.getFullYear();
+  $.post(
+    "ajax/baocao/baocaohoatdong_theonam.php",
+    {
+      nam: nam == null ? year : nam,
+      msdv: msdv == undefined ? "" : msdv,
+      loai: "theonam",
+    },
+    function (list, textStatus, jqXHR) {
+      var data = new google.visualization.DataTable();
+
+      data.addColumn("string", "Ngày");
+      data.addColumn("number", "Doanh thu");
+      data.addColumn("number", "Chi phí");
+      data.addColumn("number", "Lợi nhuận");
+      for (let i = 0; i < list.length; i++) {
+        data.addRows([
+          [
+            list[i].thang,
+            Number(list[i].doanhthu),
+            Number(list[i].chiphi),
+            Number(list[i].loinhuan),
+          ],
+        ]);
+      }
+      var view = new google.visualization.DataView(data);
+      view.setColumns([
+        0,
+        1,
+        {
+          calc: "stringify",
+          sourceColumn: 1,
+          type: "string",
+          role: "annotation",
+        },
+        2,
+        {
+          calc: "stringify",
+          sourceColumn: 2,
+          type: "string",
+          role: "annotation",
+        },
+        3,
+        {
+          calc: "stringify",
+          sourceColumn: 3,
+          type: "string",
+          role: "annotation",
+        },
+      ]);
+      var options = {
+        title: "Hoạt động kinh doanh theo tháng",
+        vAxis: { title: "Triệu đồng" },
+        seriesType: "bars",
+        legend: {
+          position: "bottom",
+        },
+      };
+
+      var chart = new google.visualization.ComboChart(
+        document.getElementById("chart_div")
+      );
+      chart.draw(view, options);
+    }
+  );
+}
+
+function load_baocao_congno_chitiet(loai) {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  $.post(
+    "ajax/baocao/baocaocongno_chitiet.php",
+    {
+      loai: loai,
+      msdv: msdv == undefined ? "" : msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    function (data, textStatus, jqXHR) {
+      $("#chitiet_baocao").html(data);
+    }
+  );
+}
+
+function baocao_search(e) {
+  var input, filter, table, tr, td, i, j, cell;
+  input = document.getElementById("search");
+  filter = input.value
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"));
+  table = document.getElementById("chitiet_baocao");
+  tr = table.getElementsByClassName("items");
+  for (i = 0; i < tr.length; i++) {
+    // Hide the row initially.
+    tr[i].style.display = "none";
+    td = tr[i].getElementsByClassName("search_key");
+    for (var j = 0; j < td.length; j++) {
+      cell = tr[i].getElementsByClassName("search_key")[j];
+      if (cell) {
+        if (
+          cell.innerHTML
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"))
+            .indexOf(filter) > -1
+        ) {
+          tr[i].style.display = "";
+          break;
+        }
+      }
+    }
+  }
+}
+
+function baocao_search_chuacodoanhthu(e) {
+  var input, filter, table, tr, td, i, j, cell;
+  input = document.getElementById("search");
+  filter = input.value
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"));
+  table = document.getElementById("chitiet_baocao_chuacodoanhthu");
+  tr = table.getElementsByClassName("items");
+  for (i = 0; i < tr.length; i++) {
+    // Hide the row initially.
+    tr[i].style.display = "none";
+    td = tr[i].getElementsByClassName("search_key");
+    for (var j = 0; j < td.length; j++) {
+      cell = tr[i].getElementsByClassName("search_key")[j];
+      if (cell) {
+        if (
+          cell.innerHTML
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"))
+            .indexOf(filter) > -1
+        ) {
+          tr[i].style.display = "";
+          break;
+        }
+      }
+    }
+  }
+}
+
+function load_khoanmuc() {
+  $("#list_khoanmuc_filter").html("");
+  $.post(
+    "ajax/danhmuc/load_danhmuc.php",
+    { phanloai: "khoanmuc" },
+    function (data) {
+      $("#list_khoanmuc_filter").append(
+        `<option selected class='text-[#747474]' value="">Khoản mục</option>`
+      );
+      for (let i = 0; i < data.length; i++) {
+        $("#list_khoanmuc_filter").append(
+          `<option class='text-black' value='${data[i].msloai}'>${data[i].tenloai}</option>`
+        );
+      }
+    }
+  );
+}
+function load_chucvu() {
+  $("#list_chucvu_filter").html("");
+  $.post(
+    "ajax/danhmuc/load_danhmuc.php",
+    { phanloai: "chucvu" },
+    function (data) {
+      $("#list_chucvu_filter").append(
+        `<option selected class='text-[#747474]' value="">Chức vụ</option>`
+      );
+      for (let i = 0; i < data.length; i++) {
+        $("#list_chucvu_filter").append(
+          `<option class='text-black' value='${data[i].msloai}'>${data[i].tenloai}</option>`
+        );
+      }
+    }
+  );
+}
+
+function load_nhanvien() {
+  $.post(
+    "ajax/thuchi/load_nhanvien.php",
+    {},
+    function (data, textStatus, jqXHR) {
+      $("#list_nguoilap_filter").append(`
+      <option selected class='text-[#747474]' value=''>Nhân viên</option>
+        `);
+      for (let i = 0; i < data.length; i++) {
+        $("#list_nguoilap_filter").append(`
+        <option class='text-black' value='${data[i].msdn}'>${data[i].hoten}</option>
+          `);
+      }
+    }
+  );
+}
+
+function load_khachhang() {
+  $.post(
+    "ajax/baocao/load_khachhang.php",
+    {},
+    function (data, textStatus, jqXHR) {
+      $("#list_khachhang_filter").append(`
+      <option selected class='text-[#747474]' value=''>Khách hàng</option>
+        `);
+      for (let i = 0; i < data.length; i++) {
+        $("#list_khachhang_filter").append(`
+        <option class='text-black' value='${data[i].sodienthoai}'>${data[i].tenkh}</option>
+          `);
+      }
+    }
+  );
+}
+
+function load_chinhanh() {
+  $.post("ajax/baocao/load_chinhanh.php", {}, function (data) {
+    $("#list_chinhanh").html(data);
+  });
+}
+
+function load_namhoatdong() {
+  const msdv = $("#list_chinhanh option:selected").val();
+  $.post(
+    "ajax/baocao/list_namhoatdong.php",
+    {
+      msdv: msdv == undefined ? "" : msdv,
+    },
+    function (data) {
+      for (let i = 0; i < data.length; i++) {
+        $("#list_namhoatdong").append(
+          `<option class='text-black' value='${data[i].nam}'>${data[i].nam}</option>`
+        );
+      }
+    }
+  );
+}
+
+function show_btn_lay_dulieu() {
+  $("#btn_get_dulieu").addClass("hidden");
+  const msdv = $("#list_chinhanh option:selected").val();
+  if (msdv != "") {
+    $("#btn_get_dulieu").removeClass("hidden");
+  }
+}
+
+function get_dulieu() {
+  const msdv = $("#list_chinhanh option:selected").val();
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  $.post(
+    "ajax/baocao/baocao_thuchiendichvu_msdv.php",
+    {
+      msdv: msdv,
+      tungay: tungay,
+      denngay: denngay,
+    },
+    function (data, textStatus, jqXHR) {
+      load_baocao_thuchiendichvu();
+    }
+  );
+}
+
+function open_modal_thutien(
+  soct,
+  sohd,
+  tongtien,
+  dathanhtoan,
+  mskh,
+  tenkh,
+  loai
+) {
+  $("#soct_thuchi").val(soct);
+  $("#sohd_thuchi").val(sohd);
+  $("#mskh_thanhtoan").val(mskh.replaceAll(".", ""));
+  $("#tenkh_thanhtoan").html(tenkh);
+  $("#tongcong_thanhtoan").val(
+    tongtien.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+  );
+  $("#sotien_dathu").val(
+    dathanhtoan.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+  );
+  $("#sotien_thanhtoan").val(
+    (tongtien - dathanhtoan)
+      .toString()
+      .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+  );
+  $("#nganquy_thutruoc").val("TM");
+  $("#qr-code").empty();
+  $("#qr_code_hidden").empty();
+  open_modal("form_thutien");
+  $("#btn_thutien_donhang").addClass("hidden");
+  $("#btn_tra_nhacc").addClass("hidden");
+  if (loai == "Receivable") {
+    $("#btn_thutien_donhang").removeClass("hidden");
+  } else {
+    $("#btn_tra_nhacc").removeClass("hidden");
+  }
+}
+function thutien_donhang() {
+  const tongcong = $("#tongcong_thanhtoan").val().replaceAll(".", "");
+  const sotien_dathu = $("#sotien_dathu").val().replaceAll(".", "");
+  const sotien = $("#sotien_thanhtoan").val().replaceAll(".", "");
+  const nganquy = $("#nganquy_thutruoc :checked").val();
+  const soct = $("#soct_thuchi").val();
+  const mskh = $("#mskh_thanhtoan").val();
+  const tenkh = $("#tenkh_thanhtoan").html();
+  const makhoanmuc = $("#ID_thubanhang").val();
+  const inskl = $("#thamso_inskl").val();
+
+  $.post(
+    "ajax/banhang/thutien_donhang.php",
+    {
+      soct: soct,
+      mskh: mskh,
+      tenkh: tenkh,
+      tenkh_khongdau: tenkh
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[đĐ]/g, (m) => (m === "đ" ? "d" : "D"))
+        .toUpperCase(),
+      tongcong: tongcong,
+      sotien_dathu: sotien_dathu,
+      sotien: sotien,
+      nganquy: nganquy,
+      makhoanmuc: makhoanmuc,
+    },
+    async function (data, textStatus, jqXHR) {
+      if (sotien > 0 && inskl == 1) {
+        if (typeof timer !== undefined) {
+          clearTimeout(this.timer);
+        }
+        let myPromise = new Promise(async function (resolve) {
+          load_img_qr_chuyenkhoan(soct);
+          setTimeout(resolve, 1000);
+        });
+        await myPromise;
+        open_print_banhang(soct, "thutien");
+      }
+      load_baocao_congno_chitiet("Receivable");
+      close_modal("form_thutien");
+    }
+  );
+}
+
+function tratien_nhacungcap() {
+  const dathanhtoan = $("#sotien_dathu").val().replaceAll(".", "");
+  const sotien = $("#sotien_thanhtoan").val().replaceAll(".", "");
+  const nganquythu = $("#nganquy_thutruoc :checked").val();
+  const soct_donhang = $("#soct_thuchi").val();
+  const maso = $("#mskh_thanhtoan").val();
+  const tenmaso = $("#tenkh_thanhtoan").html();
+  const sohd = $("#sohd_thuchi").val();
+  const makhoanmuc = $("#ID_chinhacungcap").val();
+  $.post(
+    "ajax/nhapkho/nhapkho_post_thuchi.php",
+    {
+      maso: maso,
+      tenmaso: tenmaso,
+      soct_donhang: soct_donhang,
+      sohd: sohd,
+      sotienthu: sotien,
+      makhoanmuc: makhoanmuc,
+      nganquythu: nganquythu,
+      dathanhtoan: dathanhtoan,
+    },
+    function (data) {
+      close_modal("form_post_thuchi");
+      load_baocao_congno_chitiet("Pay");
+    }
+  );
+}
+function load_img_qr_chuyenkhoan(soct) {
+  $.post(
+    "ajax/banhang/load_qr_code_banhang.php",
+    { soct: soct },
+    function (data, textStatus, jqXHR) {
+      new QRCode("qr_code_hidden", {
+        text: data[0].qr_code,
+        width: 200,
+        height: 200,
+        colorDark: "#000",
+        colorLight: "#ffff",
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    }
+  );
+}
+
+function open_print_banhang(soct, loai) {
+  var qr_img = "";
+  if (loai == "thutien") {
+    qr_img = document
+      .getElementById("qr_code_hidden")
+      .getElementsByTagName("img")[0].src;
+  }
+  $.post(
+    "ajax/banhang/inphieu_banhang.php",
+    { soct: soct, qr_img: qr_img },
+    function (data, textStatus, jqXHR) {
+      $.print(data);
+    }
+  );
+}
+
+function tinh_nolai_edit(e) {
+  const tongcong = $("#tongcong_thanhtoan").val().replaceAll(".", "");
+  const dathu = $("#sotien_dathu").val().replaceAll(".", "");
+  const thutruoc = $(e).val().replaceAll(".", "");
+  const sotienvoucher = $("#sotien_voucher").val();
+
+  $("#nolai").val(
+    (tongcong - dathu - thutruoc - sotienvoucher)
+      .toString()
+      .replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.")
+  );
+}
+
+function open_add_ctkm() {
+  open_modal("form_add_ctkm");
+}
+
+function add_ctkm() {
+  const tenctkm = $("#ten_ctkm_add").val();
+  const ptgiam = $("#ptgiam_ctkm_add").val();
+  const handung_tungay = $("#handung_tungay_input").val();
+  const handung_denngay = $("#handung_denngay_input").val();
+  const tungay = $("#tungay_input").val();
+  const denngay = $("#denngay_input").val();
+  if (tenctkm != "") {
+    $.post(
+      "ajax/baocao/add_ctkm.php",
+      {
+        tenctkm: tenctkm,
+        ptgiam: ptgiam,
+        handung_tungay: handung_tungay,
+        handung_denngay: handung_denngay,
+        tungay: tungay,
+        denngay: denngay,
+      },
+      function (data, textStatus, jqXHR) {
+        close_modal("form_add_ctkm");
+        $("#ten_ctkm_add").val("");
+        $("#ptgiam_ctkm_add").val(0);
+      }
+    );
+  }
+}

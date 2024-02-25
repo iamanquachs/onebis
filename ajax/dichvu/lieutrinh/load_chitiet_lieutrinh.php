@@ -1,0 +1,36 @@
+<?php
+include("../../../includes/config.php");
+include("../../../includes/database.php");
+include("../../../includes/database_sv.php");
+require("../../../modules/dichvuClass.php");
+
+$db = new dichvu();
+$mshs = $_COOKIE['mshs'];
+$msdv = $_COOKIE['msdv'];
+$mslieutrinh = $_POST['mslieutrinh'];
+$msdichvu = $_POST['msdichvu'];
+$loai_lieutrinh = $_POST['loai_lieutrinh'];
+if ($loai_lieutrinh == '0') {
+    $list = $db->load_chitiet_khonglieutrinh($mshs, $msdv, $mslieutrinh);
+} else {
+    $list = $db->load_chitiet_lieutrinh($mshs, $msdv, $msdichvu, $mslieutrinh);
+}
+$stt = 1;
+foreach ($list as $r) { ?>
+    <tr class="hover:cursor-pointer">
+        <td class=" px-4 py-2"><?= $stt++ ?></td>
+        <td class=" px-4 py-2"><?= $r->tenhh ?></td>
+        <td class=" px-4 py-2 text-end"><?= $r->soluong ?></td>
+        <td class=" px-4 py-2 text-end"><?= str_replace(',', '.', number_format($r->dongia)) ?></td>
+        <td class=" px-4 py-2 text-end"><?= $r->dinhluong ?></td>
+        <td class=" px-4 py-2 text-end"><?= $r->ptthuchien ?></td>
+        <td class=" py-2">
+            <div class="flex justify-center">
+                <button onclick="open_delete_chitiet_lieutrinh('<?= $r->rowid ?>','<?= $r->msdichvu ?>','<?= $r->mslieutrinh ?>','<?= $r->mshh ?>','<?= $r->tenhh ?>','<?= $loai_lieutrinh ?>')">
+                    <img class="max-w-[20px] min-w-[20px]" src="vendor/img/delete.png">
+                </button>
+            </div>
+        </td>
+    </tr>
+<?php
+}

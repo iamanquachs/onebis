@@ -1,0 +1,10 @@
+<?php
+include('__include_connect.php');
+require("../../modules/banhangClass.php");
+
+
+$db = new banhang();
+$msdv = $_COOKIE['msdv'];
+$soct = $_POST['soct'];
+$idchidinh = $_POST['idchidinh'];
+$list = $db->delete_banhang_line($msdv, $soct, $idchidinh);

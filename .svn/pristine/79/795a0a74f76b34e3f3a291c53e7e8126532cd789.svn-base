@@ -1,0 +1,17 @@
+<?php
+
+date_default_timezone_set("Asia/Bangkok");
+error_reporting(0);
+define("BASE_URL", getcwd());
+define("INCLUDES_CONTROL", BASE_URL . "/includes_control/");
+define("INCLUDES", BASE_URL . "/includes/");
+define("CONTROLS", BASE_URL . "/controller/");
+define("MODULES", BASE_URL . "/modules/");
+define("VIEWS", BASE_URL . "/views/");
+
+
+// require_once INCLUDES_CONTROL . "init_control.php";
+
+require_once INCLUDES . "init.php";
+require_once CONTROLS . "home.php";
+require_once VIEWS . "index.php";

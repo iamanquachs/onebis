@@ -1,0 +1,27 @@
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteRule "index.html" "index.php" 
+
+
+RewriteRule "^([a-zA-Z0-9]+)$" "?components=$1"
+
+RewriteRule "^([a-zA-Z0-9]+)/([a-zA-Z0-9-]+)$" "?components=$1&soct=$2"
+
+RewriteRule "^Sale/([a-zA-Z0-9-]+)$" "?components=Sale&soct=$1"
+RewriteRule "^SaleEdit/([a-zA-Z0-9-]+)$" "?components=SaleEdit&soct=$1"
+RewriteRule "^Import/([a-zA-Z0-9-]+)$" "?components=Import&soct=$1"
+RewriteRule "^Export/([a-zA-Z0-9-]+)$" "?components=Export&soct=$1"
+RewriteRule "^EditImport/([a-zA-Z0-9-]+)$" "?components=EditImport&soct=$1"
+RewriteRule "^ServiceTooth/([a-zA-Z0-9-]+)$" "?components=ServiceTooth&soct=$1"
+RewriteRule "^Category/([a-zA-Z0-9-]+)$" "?components=Category&loai=$1"
+RewriteRule "^ReportCredit/([a-zA-Z0-9-]+)$" "?components=ReportCredit&congno=$1"
+RewriteRule "^Advise/([a-zA-Z0-9-]+)$" "?components=Advise&soct=$1"
+RewriteRule "^ChatAI/([a-zA-Z0-9-]+)$" "?components=ChatAI&soct=$1"
+RewriteRule "^ManageLandingPage/([a-zA-Z0-9-]+)$" "?components=ManageLandingPage&soct=$1"
+RewriteRule "^LandingPage/([a-zA-Z0-9-]+)/([a-zA-Z0-9-]+)" "?components=LandingPage&soct=$1&r=$2"
+RewriteRule "^Customer/([a-zA-Z0-9-]+)$" "?components=Customer&soct=$1"
+
+RewriteRule "/admin/^([a-zA-Z0-9]+)$" "/admin/?components=$1"
+
+

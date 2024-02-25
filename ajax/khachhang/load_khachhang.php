@@ -1,0 +1,45 @@
+<?php
+include('__include_connect.php');
+require("../../modules/khachhangClass.php");
+
+$db = new khachhang();
+$mshs = $_COOKIE['mshs'];
+$msdv = $_COOKIE['msdv'];
+$ngaysn = $_POST['ngaysn'];
+$nhom = $_POST['nhom'];
+$list = $db->load_khachhang($mshs, $msdv,  $ngaysn, $nhom);
+$stt = 1;
+foreach ($list as $r) {
+
+?>
+    <tr class="active_items item_line items border-b border-dashed border-[#ffffff40]" onclick='active_item(this)'>
+        <td class=" text-center px-4 py-2"><?= $stt++ ?></td>
+        <td class="text-center px-4 py-2 hidden">
+            <?= $r->mskh ?>
+        </td>
+        <td class="search_key px-4 py-2 phone:min-w-[150px]"><?= $r->tenkh ?></td>
+        <td class="text-center px-4 py-2 "><?= $r->ngaysinh ?></td>
+        <td class="search_key text-center px-4 py-2 hidden"><?= $r->sdt ?></td>
+        <td class=" text-center px-4 py-2 "><?= $r->dienthoai ?></td>
+        <td class="search_key text-left px-4 py-2 "><?= $r->diachi ?></td>
+        <td class="text-right px-4 py-2 "><?= str_replace(',', '.', number_format($r->doanhso)) ?></td>
+        <td class="text-right px-4 py-2 "><?= str_replace(',', '.', number_format($r->conno)) ?></td>
+        <td class="text-center px-4 py-2 "><?= $r->nhom_kh ?></td>
+        <td class="py-2 gap-3">
+            <div class="flex justify-center items-center gap-3">
+                <!-- //show lịch sử khách như trong add ban hang -->
+                <button onclick="open_noidung('0','','','<?= $r->sodienthoai ?>')">
+                    <img class="w-[20px]" src="vendor/img/note32.png">
+                </button>
+                <button onclick="open_show_lichsu_khachhang('<?= $r->tenkh ?>','<?= $r->sodienthoai ?>')">
+                    <img class="w-[20px]" src="vendor/img/history.png">
+                </button>
+                <button onclick="open_edit_khachhang('<?= $r->mskh ?>','<?= $r->tenkh ?>','<?= $r->ngaysinh ?>','<?= $r->sodienthoai ?>','<?= $r->email ?>','<?= $r->gioitinh ?>','<?= $r->diachi ?>')">
+                    <img class="w-[20px]" src="vendor/img/edit.png">
+                </button>
+            </div>
+
+        </td>
+    </tr>
+<?php
+}

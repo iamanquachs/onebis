@@ -1,0 +1,249 @@
+<?php
+
+class dichvu extends database_sv
+{
+
+    public function load_dichvu($mshs, $msdv, $danhmuc, $loai)
+    {
+        $query = '';
+        $filter = '';
+        if ($danhmuc != '') {
+            $filter = "and a.nhom_dichvu='$danhmuc'";
+        }
+        if ($loai != '') {
+            $filter = "and a.lieutrinh='$loai'";
+        }
+        $getall = $this->connect->prepare("SELECT a.lastmodify, a.trangthai, a.msdichvu, a.tendichvu, a.nhom_dichvu, round(a.sotien, 0)sotien,a.lieutrinh, a.thoigian, a.mota, a.path_image, a.path_video, a.pttichluy, a.ptthuchien, b.tenloai,a.thuesuat ,a.songay_bh,a.giavon, a.phanbogia , count(c.msdichvu)comota 
+        FROM hosodichvu a 
+        inner join dmphanloai b on a.nhom_dichvu=b.msloai 
+        LEFT JOIN motadichvu c ON a.msdichvu=c.msdichvu and c.msdv='$msdv'
+        where a.mshs='$mshs' and a.msdv='$msdv' and b.phanloai = 'dichvu' and a.msdichvu <> 'DV0000000000000001' $query $filter 
+        GROUP BY msdichvu  order by a.lieutrinh,a.tendichvu
+        ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function add_dichvu($trangthai, $msdn, $mshs, $msdv, $msdichvu, $tendichvu, $nhom_dichvu, $lieutrinh, $sotien, $thoigian, $mota, $path_image, $path_video, $pttichluy, $ptthuchien, $thuesuat, $ngaybaohanh, $giavon)
+    {
+        $getall = $this->connect->prepare("INSERT INTO hosodichvu(lastmodify, trangthai, msdn, mshs, msdv, msdichvu, tendichvu, nhom_dichvu,lieutrinh, sotien, thoigian, giavon, mota, path_image, path_video, pttichluy,ptthuchien, thuesuat,songay_bh) VALUES(NOW(), '$trangthai','$msdn', '$mshs', '$msdv', '$msdichvu', '$tendichvu', '$nhom_dichvu','$lieutrinh', '$sotien', '$thoigian', '$giavon', '$mota', '$path_image', '$path_video', '$pttichluy', '$ptthuchien', '$thuesuat','$ngaybaohanh')  
+        ");
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function edit_dichvu($trangthai, $mshs, $msdv, $msdichvu, $tendichvu, $nhom_dichvu, $lieutrinh, $sotien, $thoigian, $mota, $path_video, $pttichluy, $ptthuchien, $thuesuat, $ngaybaohanh, $giavon)
+    {
+        $getall = $this->connect->prepare("UPDATE hosodichvu set lastmodify=NOW(),trangthai='$trangthai',tendichvu='$tendichvu',nhom_dichvu='$nhom_dichvu',lieutrinh='$lieutrinh',sotien='$sotien',thoigian='$thoigian',giavon='$giavon', mota='$mota', path_video='$path_video', pttichluy='$pttichluy',ptthuchien='$ptthuchien', thuesuat='$thuesuat', songay_bh='$ngaybaohanh' WHERE msdichvu='$msdichvu' and msdv='$msdv' and mshs='$mshs'");
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_dichvu($msdn, $msdv, $msdichvu)
+    {
+        $getall = $this->connect->prepare("CALL `CheckDelete_HHDV`('$msdv', '$msdn', '$msdichvu')");
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+    public function load_image($msdichvu)
+    {
+        $getall = $this->connect->prepare("SELECT mshs,lastmodify, path_image, path_video FROM hosodichvu where msdichvu='$msdichvu' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function edit_image($msdichvu, $path_image)
+    {
+        $getall = $this->connect->prepare("UPDATE hosodichvu set lastmodify=NOW(), path_image = '$path_image' where msdichvu='$msdichvu'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_video($msdichvu)
+    {
+        $getall = $this->connect->prepare("UPDATE hosodichvu set lastmodify=NOW(), path_video = '' where msdichvu='$msdichvu'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_lieutrinh($mshs, $msdv, $msdichvu)
+    {
+        $getall = $this->connect->prepare("SELECT mslieutrinh, tenlieutrinh, songay, thutu from hosolieutrinh where msdichvu='$msdichvu' and mshs='$mshs' and msdv='$msdv' order by thutu ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_thanhtien_dichvu($mshs, $msdv, $msdichvu)
+    {
+        $getall = $this->connect->prepare("SELECT sum(round(dongia  * soluong,0))as thanhtien from motadichvu where msdichvu='$msdichvu' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_thanhtien($mshs, $msdv, $msdichvu, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("SELECT sum(round(dongia  * soluong,0)) as thanhtien from motadichvu where msdichvu='$msdichvu' and mslieutrinh='$mslieutrinh' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function add_lieutrinh($msdn, $mshs, $msdv, $msdichvu, $mslieutrinh, $tenlieutrinh, $songay, $thutu)
+    {
+        $getall = $this->connect->prepare("INSERT INTO hosolieutrinh(lastmodify,  msdn, mshs, msdv, msdichvu, mslieutrinh, tenlieutrinh, songay,thutu) 
+        SELECT NOW(), '$msdn', '$mshs', '$msdv', '$msdichvu', '$mslieutrinh', '$tenlieutrinh', '$songay', count(thutu +1) FROM hosolieutrinh WHERE msdichvu='$msdichvu' ORDER BY thutu DESC LIMIT 1");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function select_move_lieutrinh($mshs, $msdv, $msdichvu, $thutu)
+    {
+        $getall = $this->connect->prepare("SELECT mslieutrinh, thutu from hosolieutrinh where msdichvu='$msdichvu' and thutu='$thutu' and mshs='$mshs' and msdv='$msdv'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function copy_lieutrinh($mshs, $msdv, $mslieutrinh_add, $mslieutrinh, $msdichvu)
+    {
+        $getall = $this->connect->prepare("INSERT INTO hosolieutrinh(lastmodify,  msdn, mshs, msdv, msdichvu, mslieutrinh, tenlieutrinh, songay,thutu) 
+        SELECT NOW(), msdn, mshs, msdv, msdichvu, '$mslieutrinh_add', CONCAT(tenlieutrinh, ' copy'), songay, (SELECT count(thutu) + 1 FROM hosolieutrinh WHERE msdichvu='$msdichvu'  ORDER BY thutu DESC LIMIT 1) FROM hosolieutrinh WHERE mshs='$mshs' and msdv='$msdv' and msdichvu='$msdichvu' and mslieutrinh='$mslieutrinh' ;
+        INSERT INTO motadichvu(lastmodify,msdn, mshs, msdv, msdichvu, mslieutrinh, mshh, tenhh, soluong, dongia, dinhluong)
+        SELECT NOW(), msdn, mshs, msdv, msdichvu, '$mslieutrinh_add', mshh, tenhh,soluong,dongia, dinhluong from motadichvu where mshs='$mshs' and msdv='$msdv' and msdichvu='$msdichvu'  and mslieutrinh='$mslieutrinh'
+        ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function edit_lieutrinh($mshs, $msdv, $mslieutrinh, $tenlieutrinh, $songay)
+    {
+        $getall = $this->connect->prepare("UPDATE hosolieutrinh set tenlieutrinh='$tenlieutrinh',songay='$songay' where mslieutrinh='$mslieutrinh' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function change_sotien_dichvu($mshs, $msdv, $msdichvu, $sotien)
+    {
+        $getall = $this->connect->prepare("UPDATE hosodichvu set sotien='$sotien' where msdichvu='$msdichvu' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function change_trangthai_phanbo_dichvu($mshs, $msdv, $msdichvu, $phanbogia)
+    {
+        $getall = $this->connect->prepare("UPDATE hosodichvu set phanbogia='$phanbogia' where msdichvu='$msdichvu' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function move_lieutrinh($mshs, $msdv,  $mslieutrinh, $thutu)
+    {
+        $getall = $this->connect->prepare("UPDATE hosolieutrinh set thutu='$thutu' where mslieutrinh='$mslieutrinh' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_lieutrinh($mshs, $msdv, $msdichvu, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("DELETE FROM hosolieutrinh where mslieutrinh = '$mslieutrinh' and msdichvu='$msdichvu' and mshs='$mshs' and msdv='$msdv';
+        DELETE FROM motadichvu where mslieutrinh='$mslieutrinh'  and mshs='$mshs' and msdv ='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_chitiet_lieutrinh($mshs, $msdv, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("SELECT rowid,msdichvu,mslieutrinh,mshh,tenhh, soluong, round(dongia * soluong) as dongia, dinhluong, ptthuchien from motadichvu where mslieutrinh='$mslieutrinh' and mshs='$mshs' and msdv='$msdv'  order by tenhh");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_chitiet_lieutrinh_tuvan($mshs, $msdv, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("SELECT rowid,msdichvu,mslieutrinh,mshh,tenhh, soluong, dongia, dinhluong from motadichvu where mslieutrinh='$mslieutrinh' and mshs='$mshs' and msdv='$msdv' and left(mshh,2)<>'HH' order by tenhh");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function load_chitiet_khonglieutrinh($mshs, $msdv, $mslieutrinh)
+    {
+        $getall = $this->connect->prepare("SELECT rowid,msdichvu, mslieutrinh,mshh,tenhh, soluong, round(dongia * soluong,0) as dongia, dinhluong, ptthuchien  from motadichvu where msdichvu='$mslieutrinh' and mshs='$mshs' and msdv='$msdv'  order by tenhh");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function find_hanghoa($mshs, $msdv, $tensanpham, $msdichvu, $phanbo)
+    {
+        //Không cho tìm những thằng có mô tả vì khi sum lên trong gói số tiền sẽ lệch mô tả của dịch vụ thêm
+        $query = '';
+        if ($phanbo == 'true') {
+            $query = "and msdichvu not in (select msdichvu from motadichvu where mshs='$mshs' and msdv='$msdv')";
+        }
+        $getall = $this->connect->prepare("SELECT  mshh,tenhh, giaban,dvt_quydoi, soluong_quydoi, 0 loai, ptthuchien from hosohanghoa where trangthai='0' and mshs='$mshs' and msdv='$msdv' and mshh not like '$msdichvu' AND tenhh like '%$tensanpham%'
+        UNION ALL 
+        SELECT msdichvu AS mshh, tendichvu AS tenhh, sotien AS giaban,'' dvt_quydoi, '' soluong_quydoi, 1 loai, ptthuchien FROM hosodichvu
+         WHERE msdv='$msdv' and mshs='$mshs' AND trangthai ='0' AND msdichvu not like '$msdichvu' AND tendichvu like '%$tensanpham%' and lieutrinh = 0 $query  ORDER BY loai, tenhh");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function add_chitiet_lieutrinh($msdn, $mshs, $msdv, $msdichvu, $mslieutrinh, $mshh, $tenhh, $soluong, $dongia, $dinhluong, $ptthuchien)
+    {
+        $getall = $this->connect->prepare("INSERT INTO motadichvu(lastmodify,msdn, mshs, msdv, msdichvu, mslieutrinh, mshh, tenhh, soluong, dongia, dinhluong, ptthuchien)VALUES(now(),'$msdn','$mshs','$msdv','$msdichvu','$mslieutrinh','$mshh','$tenhh','$soluong',round($dongia / $soluong, 4),'$dinhluong','$ptthuchien')");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function delete_chitiet_lieutrinh($rowid, $mshs, $msdv, $msdichvu, $mslieutrinh, $mshh,  $sotien, $phanbo)
+    {
+        $query = '';
+        if ($phanbo === 'false') {
+            $query = "UPDATE hosodichvu set sotien = '$sotien' where msdichvu='$msdichvu' and mshs='$mshs' and msdv ='$msdv'";
+        }
+        $getall = $this->connect->prepare("DELETE FROM motadichvu where rowid='$rowid' and mslieutrinh='$mslieutrinh' and msdichvu='$msdichvu' and mshh='$mshh' and mshs='$mshs' and msdv ='$msdv'; $query ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function update_thanhtien_dichvu($mshs, $msdv, $msdichvu,  $sotien)
+    {
+        $getall = $this->connect->prepare("UPDATE hosodichvu set lastmodify=NOW(), sotien = '$sotien' where msdichvu='$msdichvu' and mshs='$mshs' and msdv ='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function update_sotien_chitiet_dichvu($mshs, $msdv, $msdichvu, $mshh, $loai)
+    {
+        $getall = $this->connect->prepare("CALL `Show_GiaDV`('$mshs', '$msdv', '$msdichvu', '$mshh', '$loai')");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function ktra_edit_giaban_dichvu($mshs, $msdv, $msdichvu)
+    {
+        $getall = $this->connect->prepare("SELECT if(COUNT(rowid) = 0 ,'mo','khoa')trangthai from motadichvu where msdichvu='$msdichvu' and mshs='$mshs' and msdv='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function ktra_dichvu_co_phanbogia($mshs, $msdv, $msdichvu)
+    {
+        $getall = $this->connect->prepare("SELECT if(phanbogia = 1 ,'true','false')trangthai FROM hosodichvu WHERE mshs='$mshs' AND msdv='$msdv' and mshh='$msdichvu'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+    public function ktra_dichvu_co_trong_dichvu($mshs, $msdv, $msdichvu)
+    {
+        $getall = $this->connect->prepare("SELECT a.msdichvu,if(b.phanbogia = 1 ,'true','false')trangthai, b.tendichvu FROM  motadichvu a INNER JOIN hosodichvu b ON a.msdv=b.msdv and a.msdichvu=b.msdichvu where a.mshs='$mshs' AND a.msdv='$msdv' and a.mshh='$msdichvu'");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+
+    public function update_sotien_dichvu_trongmota($mshs, $msdv, $msdichvu, $mshh, $sotien)
+    {
+        $getall = $this->connect->prepare("UPDATE motadichvu set lastmodify=NOW(), dongia = '$sotien' where msdichvu='$msdichvu' and mshh='$mshh' and mshs='$mshs' and msdv ='$msdv' ");
+        $getall->setFetchMode(PDO::FETCH_OBJ);
+        $getall->execute();
+        return $getall->fetchAll();
+    }
+}

@@ -1,0 +1,379 @@
+<main class="bg_main ">
+
+    <div class="flex flex-col">
+        <!--Grid Form-->
+        <div class="flex flex-1  flex-col md:flex-row lg:flex-row ">
+            <div class="mb-2 bg-[#ffffff36] rounded shadow-sm w-full">
+                <div class="">
+                    <div class="flex justify-between px-3 py-2 items-center  border-b border-[#ffffff40]">
+                        <div class="flex gap-5   items-center ">
+                            <p class="text-lg text-[#83ff00]">Quản lý thành viên</p>
+                        </div>
+                        <div class="flex gap-5 items-center">
+                            <button type="button" id="btn_add" onclick="open_modal('form_add_member')" class="bg-[#008d3f] border-none px-5 py-2 text-white rounded-md">Thêm nhóm </button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class=" py-3 overflow-x-scroll">
+                    <table class=" min-w-full">
+                        <thead>
+                            <tr class="text-[#efbff5] text-lg">
+                                <th class=" px-4 py-2 text-center font-thin">#</th>
+                                <th class=" px-4 py-2 text-start font-thin">Tên nhóm</th>
+                                <th class=" px-4 py-2 text-center font-thin ">% Giảm</th>
+                                <th class=" px-4 py-2 text-end font-thin ">Số tiền từ</th>
+                                <th class=" px-4 py-2 text-end font-thin ">Số tiền đến</th>
+                                <th class=" px-4 py-2 font-thin text-center">...</th>
+                            </tr>
+
+                        </thead>
+                        <tbody id='list_member' class="0 ">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="mb-2 bg-[#ffffff36] rounded shadow-sm w-full">
+                <div class="">
+                    <div class="flex justify-between px-3 py-2 items-center  border-b border-[#ffffff40]">
+                        <div class="flex gap-5   items-center ">
+                            <p class="text-lg text-[#83ff00]">Phân khúc khách hàng</p>
+                        </div>
+                        <div class="flex gap-5 items-center">
+                            <button type="button" id="btn_add" onclick="open_modal('form_add_phankhuc')" class="bg-[#008d3f] border-none px-5 py-2 text-white rounded-md">Thêm phân khúc </button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class=" py-3 overflow-x-scroll">
+                    <table class=" min-w-full">
+                        <thead>
+                            <tr class="text-[#efbff5] text-lg">
+                                <th class=" px-4 py-2 text-center font-thin">#</th>
+                                <th class=" px-4 py-2 text-center font-thin">Tuổi từ</th>
+                                <th class=" px-4 py-2 text-center font-thin ">Tuổi đến</th>
+                                <th class=" px-4 py-2 font-thin text-center">...</th>
+                            </tr>
+
+                        </thead>
+                        <tbody id='list_phankhuc' class="0 ">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+<!-- Form add voucher-->
+<div class="relative z-10 hidden" id="form_add_member" aria-labelledby="modal-title" data-te-modal-init role="dialog" aria-hidden="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+
+            <div id="kichthuoc_form" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full max-w-md">
+                <div class="bg-white">
+                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                        <!--Modal title-->
+                        <h5 class="text-xl font-medium leading-normal !text-[green]" id="exampleModalLabel">
+                            Thêm nhóm <span class='tenphanloai_btn lowercase'></span>
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" onclick="close_modal('form_add_member')" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                            <img src="vendor/img/cancel.png">
+                        </button>
+                    </div>
+                    <!--Modal body-->
+                    <div class="p-4  " data-te-modal-body-ref>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Tên nhóm</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="tennhom_add" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">% Giảm</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="ptgiam_add" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Số tiền từ</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="sotientu_add" onkeyup="_ChangeFormat(this)" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Số tiền đến</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="sotienden_add" onkeyup="_ChangeFormat(this)" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id='footer_thongbao' class="bg-gray-50 px-4 py-3 flex justify-end gap-3">
+                    <button type="button" id='btn_chi' onclick="add_member('NKH')" class="mt-3 inline-flex w-full justify-center rounded-md bg-green-600 px-7 py-2 text-[14px]  text-white shadow-sm t ring-gray-300 hover:bg-[green]  sm:mt-0 max-w-[100px] ">Lưu</button>
+                    <button type="button" onclick="close_modal('form_add_member')" class="mt-3 inline-flex w-full justify-center rounded-md bg-[#ddd] px-7 py-2 text-[14px] text-gray-900 shadow-sm  hover:bg-gray-300 sm:mt-0 max-w-[100px] ">Hủy</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Form delete voucher-->
+<div class="relative z-10 hidden" id="form_delete_member" aria-labelledby="modal-title" data-te-modal-init role="dialog" aria-hidden="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+
+            <div id="kichthuoc_form" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full max-w-lg">
+                <div class="bg-white">
+                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                        <!--Modal title-->
+                        <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200" id="exampleModalLabel">
+                            <p class='text-[red]'>Đồng ý xóa</p>
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" onclick="close_modal('form_delete_member')" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                            <img src="vendor/img/cancel.png">
+                        </button>
+                    </div>
+                    <!--Modal body-->
+                    <div class="p-2   flex justify-center" id="" data-te-modal-body-ref>
+                        <p id="tennhom_delete" class="text-lg "></p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 flex justify-end gap-3">
+                    <input hidden id="msnhom_delete">
+                    <button type="button" onclick="delete_member()" class="mt-3 inline-flex w-full justify-center rounded-md bg-red-500 px-5 py-2 text-[14px]  text-white shadow-sm t ring-gray-300 hover:bg-[red]  sm:mt-0 max-w-[100px] ">Đồng ý</button>
+                    <button type="button" onclick="close_modal('form_delete_member')" class="mt-3 inline-flex w-full justify-center rounded-md bg-[#ddd] px-5 py-2 text-[14px] text-gray-900 shadow-sm  hover:bg-gray-300 sm:mt-0 max-w-[100px] ">Hủy</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Form edit voucher-->
+<div class="relative z-10 hidden" id="form_edit_member" aria-labelledby="modal-title" data-te-modal-init role="dialog" aria-hidden="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+
+            <div id="kichthuoc_form" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full max-w-md">
+                <div class="bg-white">
+                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                        <!--Modal title-->
+                        <h5 class="text-xl font-medium leading-normal !text-[green]" id="exampleModalLabel">
+                            Cập nhật thông tin </h5>
+                        <!--Close button-->
+                        <button type="button" onclick="close_modal('form_edit_member')" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                            <img src="vendor/img/cancel.png">
+                        </button>
+                    </div>
+                    <!--Modal body-->
+                    <div class="p-4  " data-te-modal-body-ref>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Tên nhóm</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="tennhom_edit" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">% Giảm</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="ptgiam_edit" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Số tiền từ</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="sotientu_edit" onkeyup="_ChangeFormat(this)" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Số tiền đến</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="sotienden_edit" onkeyup="_ChangeFormat(this)" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id='footer_thongbao' class="bg-gray-50 px-4 py-3 flex justify-end gap-3">
+                    <input hidden id="msnhom_edit">
+                    <button type="button" id='btn_chi_edit' onclick="edit_member()" class="mt-3 inline-flex w-full justify-center rounded-md bg-green-500 px-5 py-2 text-[14px]  text-white shadow-sm t ring-gray-300 hover:bg-[green]  sm:mt-0 max-w-[100px] ">Lưu</button>
+                    <button type="button" onclick="close_modal('form_edit_member')" class="mt-3 inline-flex w-full justify-center rounded-md bg-[#ddd] px-5 py-2 text-[14px] text-gray-900 shadow-sm  hover:bg-gray-300 sm:mt-0 max-w-[100px] ">Hủy</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Form add Phân khúc-->
+<div class="relative z-10 hidden" id="form_add_phankhuc" aria-labelledby="modal-title" data-te-modal-init role="dialog" aria-hidden="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+
+            <div id="kichthuoc_form" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full max-w-md">
+                <div class="bg-white">
+                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                        <!--Modal title-->
+                        <h5 class="text-xl font-medium leading-normal !text-[green]" id="exampleModalLabel">
+                            Thêm phân khúc
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" onclick="close_modal('form_add_phankhuc')" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                            <img src="vendor/img/cancel.png">
+                        </button>
+                    </div>
+                    <!--Modal body-->
+                    <div class="p-4  " data-te-modal-body-ref>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Tuổi từ</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="tuoitu_add" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Tuổi đến</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="tuoiden_add" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id='footer_thongbao' class="bg-gray-50 px-4 py-3 flex justify-end gap-3">
+                    <button type="button" id='btn_chi' onclick="add_phankhuc()" class="mt-3 inline-flex w-full justify-center rounded-md bg-green-600 px-7 py-2 text-[14px]  text-white shadow-sm t ring-gray-300 hover:bg-[green]  sm:mt-0 max-w-[100px] ">Lưu</button>
+                    <button type="button" onclick="close_modal('form_add_phankhuc')" class="mt-3 inline-flex w-full justify-center rounded-md bg-[#ddd] px-7 py-2 text-[14px] text-gray-900 shadow-sm  hover:bg-gray-300 sm:mt-0 max-w-[100px] ">Hủy</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Form edit Phân khúc-->
+<div class="relative z-10 hidden" id="form_edit_phankhuc" aria-labelledby="modal-title" data-te-modal-init role="dialog" aria-hidden="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+
+            <div id="kichthuoc_form" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full max-w-md">
+                <div class="bg-white">
+                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                        <!--Modal title-->
+                        <h5 class="text-xl font-medium leading-normal !text-[green]" id="exampleModalLabel">
+                            Chỉnh phân khúc
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" onclick="close_modal('form_edit_phankhuc')" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                            <img src="vendor/img/cancel.png">
+                        </button>
+                    </div>
+                    <!--Modal body-->
+                    <div class="p-4  " data-te-modal-body-ref>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Tuổi từ</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="tuoitu_edit" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-12 w-full justify-between items-center py-3 ">
+                            <p class="col-span-4  text-[black]">Tuổi đến</p>
+                            <div class="col-span-8 mt-2">
+                                <input id="tuoiden_edit" class='w-full border-b px-2  border-[#ddd] text-[black] focus:outline-none' type="text" autocomplete="off">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id='footer_thongbao' class="bg-gray-50 px-4 py-3 flex justify-end gap-3">
+                    <input hidden id='rowid_phankhuc_edit' />
+                    <button type="button" id='btn_chi' onclick="edit_phankhuc()" class="mt-3 inline-flex w-full justify-center rounded-md bg-green-600 px-7 py-2 text-[14px]  text-white shadow-sm t ring-gray-300 hover:bg-[green]  sm:mt-0 max-w-[100px] ">Lưu</button>
+                    <button type="button" onclick="close_modal('form_edit_phankhuc')" class="mt-3 inline-flex w-full justify-center rounded-md bg-[#ddd] px-7 py-2 text-[14px] text-gray-900 shadow-sm  hover:bg-gray-300 sm:mt-0 max-w-[100px] ">Hủy</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- form delete phankhuc -->
+<div class="relative z-10 hidden" id="form_delete_phankhuc" aria-labelledby="modal-title" data-te-modal-init role="dialog" aria-hidden="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+        <div class="flex min-h-full justify-center p-4 text-center items-center sm:p-0">
+
+            <div id="kichthuoc_form" class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full max-w-lg">
+                <div class="bg-white">
+                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                        <!--Modal title-->
+                        <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200" id="exampleModalLabel">
+                            <p class='text-[red]'>Đồng ý xóa</p>
+                        </h5>
+                        <!--Close button-->
+                        <button type="button" onclick="close_modal('form_delete_phankhuc')" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                            <img src="vendor/img/cancel.png">
+                        </button>
+                    </div>
+                    <!--Modal body-->
+                    <div class="p-2   flex justify-center" id="" data-te-modal-body-ref>
+                        <p id="tenphankhuc_delete" class="text-lg "></p>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 flex justify-end gap-3">
+                    <input hidden id="rowid_delete">
+                    <button type="button" onclick="delete_member()" class="mt-3 inline-flex w-full justify-center rounded-md bg-red-500 px-5 py-2 text-[14px]  text-white shadow-sm t ring-gray-300 hover:bg-[red]  sm:mt-0 max-w-[100px] ">Đồng ý</button>
+                    <button type="button" onclick="close_modal('form_delete_phankhuc')" class="mt-3 inline-flex w-full justify-center rounded-md bg-[#ddd] px-5 py-2 text-[14px] text-gray-900 shadow-sm  hover:bg-gray-300 sm:mt-0 max-w-[100px] ">Hủy</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(async function() {
+        await load_member()
+        await load_phankhuc()
+
+    })
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var dateToday = new Date();
+        $("#tungay input, #denngay input, #handung input").datepicker({
+            autoclose: true,
+            todayHighlight: true,
+        });
+        $('#tungay input').datepicker('update', new Date());
+    });
+</script>
+<script>
+    jQuery(document).ready(function($) {
+        $('.txt_date').inputmask({
+            mask: "1/2/y",
+            placeholder: "dd/mm/yyyy",
+            leapday: "29/02/",
+            separator: "/",
+            alias: "dd/mm/yyyy",
+        });
+    });
+</script>
+<link href="vendor/css/datepicker.css" rel="stylesheet">
+<script src="vendor/js/bootstrap-datepicker.js"></script>
+<script type="text/javascript" src="vendor/js/member.js?v=<?= md5_file('vendor/js/member.js') ?>"></script>
